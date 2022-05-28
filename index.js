@@ -12,7 +12,6 @@ admin.initializeApp({
 app.use(express.json())
 
 app.post('/notifications', (req,res) => {
-  console.log(req.body.buyerId)
   admin.firestore().collection('Users').doc(req.body.buyerId).get()
   .then(buyerSnapshot => {
     admin.firestore().collection('Users').doc(req.body.book.seller).get()
@@ -30,36 +29,35 @@ app.post('/notifications', (req,res) => {
   document.write(today);
   
   admin.firestore().collection('Notifications').doc(req.body.buyerId)
-    .set(
-      {
-        kind: 'buyer',
-        type: 'processing',
-        bookId: req.body.bookName,
-        date: today,
-        partner: req.body.book.seller
-      }
-    )
+    .set({
+      kind: 'buyer',
+      type: 'processing',
+      bookId: req.body.bookName,
+      partner: req.body.book.seller
+    }).then(() => {
+      console.log('Notification added');
+    })
 })
 
 async function handleRegisterToBuy(buyerInfo, sellerInfo, book) {
-    console.log(buyerInfo, sellerInfo, book)
-    await admin.messaging().sendToDevice(
-        sellerInfo.tokens,
-        {
-            data: {
-                buyer: JSON.stringify(buyerInfo),
-                seller: JSON.stringify(sellerInfo),
-                book: JSON.stringify(book)
-            }
-        },
-        {
-            priority: 'high',
-        }
-    )
+  await admin.messaging().sendToDevice(
+    sellerInfo.tokens,
+    {
+      data: {
+        buyer: JSON.stringify(buyerInfo),
+        seller: JSON.stringify(sellerInfo),
+        book: JSON.stringify(book)
+      }
+    },
+    {
+      priority: 'high',
+    }
+  ).then(() => {
+    console.log('Message sent')
+  })
 }
 
 const PORT = process.env.PORT || 3000
-
 
 app.listen(PORT, () => {
     console.log('server running')
