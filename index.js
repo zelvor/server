@@ -12,14 +12,33 @@ admin.initializeApp({
 app.use(express.json())
 
 app.post('/notifications', (req,res) => {
-    console.log(req.body.buyerId)
-    admin.firestore().collection('Users').doc(req.body.buyerId).get()
-    .then(buyerSnapshot => {
-        admin.firestore().collection('Users').doc(req.body.book.seller).get()
-        .then(sellerSnapshot => {
-            handleRegisterToBuy(buyerSnapshot.data(),sellerSnapshot.data(),req.body.book)
-        })
-    })    
+  console.log(req.body.buyerId)
+  admin.firestore().collection('Users').doc(req.body.buyerId).get()
+  .then(buyerSnapshot => {
+    admin.firestore().collection('Users').doc(req.body.book.seller).get()
+    .then(sellerSnapshot => {
+        handleRegisterToBuy(buyerSnapshot.data(),sellerSnapshot.data(),req.body.book)
+    })
+  })
+
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, '0');
+  var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+  var yyyy = today.getFullYear();
+
+  today = dd + '/' + mm + '/' + yyyy;
+  document.write(today);
+  
+  admin.firestore().collection('Notifications').doc(req.body.buyerId)
+    .set(
+      {
+        kind: 'buyer',
+        type: 'processing',
+        bookId: req.body.bookName,
+        date: today,
+        partner: req.body.book.seller
+      }
+    )
 })
 
 async function handleRegisterToBuy(buyerInfo, sellerInfo, book) {
