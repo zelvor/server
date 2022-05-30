@@ -36,7 +36,7 @@ app.post('/seller-notifications', (req,res) => {
   // if(req.body.type == 'accepted') {
   //   handleAccept(req.body.sender, req.body.receiver, req.body.book)
   // }
-  console.log(req)
+  console.log(req.body)
 })
 
 async function sendMessage(sender, receiver, book, kind, type, price) {
