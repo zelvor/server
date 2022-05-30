@@ -78,8 +78,10 @@ async function handleAccept(seller, buyer, book) {
         type: 'accepted',
         partner: buyer
       })
-      await admin.firestore().collection('Notifications').doc(seller).update({
+      admin.firestore().collection('Notifications').doc(seller).update({
         notifications: notifications
+      }).then(() => {
+        console.log('Seller notifications updated')
       })
     })
 
@@ -100,8 +102,10 @@ async function handleAccept(seller, buyer, book) {
         type: 'accepted',
         partner: seller
       })
-      await admin.firestore().collection('Notifications').doc(buyer).update({
+      admin.firestore().collection('Notifications').doc(buyer).update({
         notifications: notifications
+      }).then(() => {
+        console.log('Buyer notifications updated')
       })
     })
 }
