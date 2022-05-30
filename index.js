@@ -4,6 +4,7 @@ const app = express()
 
 var serviceAccount = require("./tinbk-48003-firebase-adminsdk-jjo22-7021491d5b.json");
 
+var today = new Date()
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -16,19 +17,20 @@ app.post('/buyer-notifications', (req,res) => {
   .then(buyerSnapshot => {
     admin.firestore().collection('Users').doc(req.body.book.seller).get()
     .then(sellerSnapshot => {
-        handleRegisterToBuy(buyerSnapshot.data(),sellerSnapshot.data(),req.body.book)
+        handleRegisterToBuy(buyerSnapshot.data(),sellerSnapshot.data(),req.body.book,req.body.price)
       })
     })
 })
 
-async function handleRegisterToBuy(buyerInfo, sellerInfo, book) {
+async function handleRegisterToBuy(buyerInfo, sellerInfo, book, price) {
   await admin.messaging().sendToDevice(
     sellerInfo.tokens,
     {
       data: {
         buyer: JSON.stringify(buyerInfo),
         seller: JSON.stringify(sellerInfo),
-        book: JSON.stringify(book)
+        book: JSON.stringify(book),
+        price: JSON.stringify(price)
       }
     },
     {
@@ -37,6 +39,14 @@ async function handleRegisterToBuy(buyerInfo, sellerInfo, book) {
   ).then(() => {
     console.log('Message sent')
   })
+}
+
+async function handleUpdateBuyerNotification() {
+  
+}
+
+async function handleUpdateSellerNotification() {
+  
 }
 
 const PORT = process.env.PORT || 3000
