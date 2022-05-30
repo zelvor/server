@@ -22,6 +22,10 @@ app.post('/buyer-notifications', (req,res) => {
     })
 })
 
+app.post('/seller-notifications', (req,res) => {
+  console.log(req.body)
+})
+
 async function handleRegisterToBuy(buyerInfo, sellerInfo, book, price) {
   await admin.messaging().sendToDevice(
     sellerInfo.tokens,
