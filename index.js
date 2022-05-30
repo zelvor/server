@@ -33,10 +33,10 @@ app.post('/buyer-notifications', (req,res) => {
 })
 
 app.post('/seller-notifications', (req,res) => {
-  // if(req.body.type == 'accepted') {
-  //   handleAccept(req.body.sender, req.body.receiver, req.body.book)
-  // }
   console.log(req.body)
+  if(req.body.type == 'accepted') {
+    handleAccept(req.body.sender, req.body.receiver, req.body.book)
+  }
 })
 
 async function sendMessage(sender, receiver, book, kind, type, price) {
@@ -60,51 +60,51 @@ async function sendMessage(sender, receiver, book, kind, type, price) {
   })
 }
 
-// async function handleAccept(seller, buyer, book) {
-//   await admin.firestore().collection('Notifications').doc(seller).get()
-//     .then(sellerNotiSnapshot => {
-//       var notifications = sellerNotiSnapshot.data().notifications
-//       for(let i = 0; i < notifications.length; i++) {
-//         if(notifications[i].bookId == book) {
-//           notifications.pop(notifications[i])
-//         }
-//       }
-//       notifications.push({
-//         bookId: book,
-//         date: String(today.getDate()).padStart(2, '0') + '/' 
-//             + String(today.getMonth() + 1).padStart(2, '0') + '/' 
-//             + today.getFullYear(),
-//         kind: 'seller',
-//         type: 'accepted',
-//         partner: buyer
-//       })
-//       await admin.firestore().collection('Notifications').doc(seller).update({
-//         notifications: notifications
-//       })
-//     })
+async function handleAccept(seller, buyer, book) {
+  await admin.firestore().collection('Notifications').doc(seller).get()
+    .then(sellerNotiSnapshot => {
+      var notifications = sellerNotiSnapshot.data().notifications
+      for(let i = 0; i < notifications.length; i++) {
+        if(notifications[i].bookId == book) {
+          notifications.pop(notifications[i])
+        }
+      }
+      notifications.push({
+        bookId: book,
+        date: String(today.getDate()).padStart(2, '0') + '/' 
+            + String(today.getMonth() + 1).padStart(2, '0') + '/' 
+            + today.getFullYear(),
+        kind: 'seller',
+        type: 'accepted',
+        partner: buyer
+      })
+      await admin.firestore().collection('Notifications').doc(seller).update({
+        notifications: notifications
+      })
+    })
 
-//   await admin.firestore().collection('Notifications').doc(seller).get()
-//     .then(buyerNotiSnapshot => {
-//       var notifications = buyerNotiSnapshot.data().notifications
-//       for(let i = 0; i < notifications.length; i++) {
-//         if(notifications[i].bookId == book) {
-//           notifications.pop(notifications[i])
-//         }
-//       }
-//       notifications.push({
-//         bookId: book,
-//         date: String(today.getDate()).padStart(2, '0') + '/' 
-//             + String(today.getMonth() + 1).padStart(2, '0') + '/' 
-//             + today.getFullYear(),
-//         kind: 'buyer',
-//         type: 'accepted',
-//         partner: seller
-//       })
-//       await admin.firestore().collection('Notifications').doc(buyer).update({
-//         notifications: notifications
-//       })
-//     })
-// }
+  await admin.firestore().collection('Notifications').doc(buyer).get()
+    .then(buyerNotiSnapshot => {
+      var notifications = buyerNotiSnapshot.data().notifications
+      for(let i = 0; i < notifications.length; i++) {
+        if(notifications[i].bookId == book) {
+          notifications.pop(notifications[i])
+        }
+      }
+      notifications.push({
+        bookId: book,
+        date: String(today.getDate()).padStart(2, '0') + '/' 
+            + String(today.getMonth() + 1).padStart(2, '0') + '/' 
+            + today.getFullYear(),
+        kind: 'buyer',
+        type: 'accepted',
+        partner: seller
+      })
+      await admin.firestore().collection('Notifications').doc(buyer).update({
+        notifications: notifications
+      })
+    })
+}
 
 async function handleReject(seller, buyer, book) {
   await admin.collection('Notifications').doc(seller)
