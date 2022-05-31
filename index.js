@@ -64,12 +64,10 @@ async function handleAccept(seller, buyer, book, price) {
   await admin.firestore().collection('Notifications').doc(seller).get()
     .then(sellerNotiSnapshot => {
       var notifications = sellerNotiSnapshot.data().notifications
-      for(let i = 0; i < notifications.length; i++) {
-        if(notifications[i].bookId === book) {
-          notifications.pop(notifications[i])
-        }
-      }
-      notifications.push({
+      var newNotifications = notifications.filter((notification) => {
+        return notification.bookId != book
+      })
+      newNotifications.push({
         bookId: book,
         date: String(today.getDate()).padStart(2, '0') + '/' 
             + String(today.getMonth() + 1).padStart(2, '0') + '/' 
@@ -80,7 +78,7 @@ async function handleAccept(seller, buyer, book, price) {
         price: price
       })
       admin.firestore().collection('Notifications').doc(seller).update({
-        notifications: notifications
+        notifications: newNotifications
       }).then(() => {
         console.log('Seller notifications updated')
       })
@@ -89,12 +87,10 @@ async function handleAccept(seller, buyer, book, price) {
   await admin.firestore().collection('Notifications').doc(buyer).get()
     .then(buyerNotiSnapshot => {
       var notifications = buyerNotiSnapshot.data().notifications
-      for(let i = 0; i < notifications.length; i++) {
-        if(notifications[i].bookId === book) {
-          notifications.pop(notifications[i])
-        }
-      }
-      notifications.push({
+      var newNotifications = notifications.filter((notification) => {
+        return notification.bookId != book
+      })
+      newNotifications.push({
         bookId: book,
         date: String(today.getDate()).padStart(2, '0') + '/' 
             + String(today.getMonth() + 1).padStart(2, '0') + '/' 
@@ -105,7 +101,7 @@ async function handleAccept(seller, buyer, book, price) {
         price: price
       })
       admin.firestore().collection('Notifications').doc(buyer).update({
-        notifications: notifications
+        notifications: newNotifications
       }).then(() => {
         console.log('Buyer notifications updated')
       })
