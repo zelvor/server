@@ -35,7 +35,7 @@ app.post('/buyer-notifications', (req,res) => {
 app.post('/seller-notifications', (req,res) => {
   console.log(req.body)
   if(req.body.type == 'accepted') {
-    handleAccept(req.body.sender, req.body.receiver, req.body.book)
+    handleAccept(req.body.sender, req.body.receiver, req.body.book, req.body.price)
   }
 })
 
@@ -60,7 +60,7 @@ async function sendMessage(sender, receiver, book, kind, type, price) {
   })
 }
 
-async function handleAccept(seller, buyer, book) {
+async function handleAccept(seller, buyer, book, price) {
   await admin.firestore().collection('Notifications').doc(seller).get()
     .then(sellerNotiSnapshot => {
       var notifications = sellerNotiSnapshot.data().notifications
@@ -76,7 +76,8 @@ async function handleAccept(seller, buyer, book) {
             + today.getFullYear(),
         kind: 'seller',
         type: 'accepted',
-        partner: buyer
+        partner: buyer,
+        price: price
       })
       admin.firestore().collection('Notifications').doc(seller).update({
         notifications: notifications
