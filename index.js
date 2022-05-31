@@ -137,7 +137,7 @@ async function handleReject(seller, buyer, book, price) {
     .then(buyerNotiSnapshot => {
       var notifications = buyerNotiSnapshot.data().notifications
       var newNotifications = notifications.filter((notification) => {
-        return !(notification.bookId == book && notification.partner == buyer)
+        return !(notification.bookId == book && notification.partner == seller)
       })
       newNotifications.push({
         bookId: book,
