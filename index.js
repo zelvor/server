@@ -66,7 +66,7 @@ async function handleAccept(seller, buyer, book, price) {
     .then(sellerNotiSnapshot => {
       var notifications = sellerNotiSnapshot.data().notifications
       var newNotifications = notifications.filter((notification) => {
-        return !(notification.bookId != book && notification.partner == buyer)
+        return notification.bookId != book
       })
       newNotifications.push({
         bookId: book,
@@ -89,7 +89,7 @@ async function handleAccept(seller, buyer, book, price) {
     .then(buyerNotiSnapshot => {
       var notifications = buyerNotiSnapshot.data().notifications
       var newNotifications = notifications.filter((notification) => {
-        return !(notification.bookId != book && notification.partner == seller)
+        return notification.bookId != book
       })
       newNotifications.push({
         bookId: book,
