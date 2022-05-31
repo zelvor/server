@@ -65,7 +65,7 @@ async function handleAccept(seller, buyer, book, price) {
     .then(sellerNotiSnapshot => {
       var notifications = sellerNotiSnapshot.data().notifications
       for(let i = 0; i < notifications.length; i++) {
-        if(notifications[i].bookId == book) {
+        if(notifications[i].bookId === book) {
           notifications.pop(notifications[i])
         }
       }
@@ -90,7 +90,7 @@ async function handleAccept(seller, buyer, book, price) {
     .then(buyerNotiSnapshot => {
       var notifications = buyerNotiSnapshot.data().notifications
       for(let i = 0; i < notifications.length; i++) {
-        if(notifications[i].bookId == book) {
+        if(notifications[i].bookId === book) {
           notifications.pop(notifications[i])
         }
       }
@@ -101,7 +101,8 @@ async function handleAccept(seller, buyer, book, price) {
             + today.getFullYear(),
         kind: 'buyer',
         type: 'accepted',
-        partner: seller
+        partner: seller,
+        price: price
       })
       admin.firestore().collection('Notifications').doc(buyer).update({
         notifications: notifications
