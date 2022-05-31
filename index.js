@@ -37,6 +37,7 @@ app.post('/seller-notifications', (req,res) => {
   if(req.body.type == 'accepted') {
     handleAccept(req.body.sender, req.body.receiver, req.body.book, req.body.price)
   }
+  else handleReject(req.body.sender, req.body.receiver, req.body.book, req.body.price)
 })
 
 async function sendMessage(sender, receiver, book, kind, type, price) {
@@ -108,8 +109,52 @@ async function handleAccept(seller, buyer, book, price) {
     })
 }
 
-async function handleReject(seller, buyer, book) {
-  await admin.collection('Notifications').doc(seller)
+async function handleReject(seller, buyer, book, price) {
+  await admin.firestore().collection('Notifications').doc(seller).get()
+    .then(sellerNotiSnapshot => {
+      var notifications = sellerNotiSnapshot.data().notifications
+      var newNotifications = notifications.filter((notification) => {
+        return notification.parnter == buyer
+      })
+      newNotifications.push({
+        bookId: book,
+        date: String(today.getDate()).padStart(2, '0') + '/' 
+            + String(today.getMonth() + 1).padStart(2, '0') + '/' 
+            + today.getFullYear(),
+        kind: 'seller',
+        type: 'rejected',
+        partner: buyer,
+        price: price
+      })
+      admin.firestore().collection('Notifications').doc(seller).update({
+        notifications: newNotifications
+      }).then(() => {
+        console.log('Seller notifications updated')
+      })
+    })
+
+  await admin.firestore().collection('Notifications').doc(buyer).get()
+    .then(buyerNotiSnapshot => {
+      var notifications = buyerNotiSnapshot.data().notifications
+      var newNotifications = notifications.filter((notification) => {
+        return notification.bookId == book
+      })
+      newNotifications.push({
+        bookId: book,
+        date: String(today.getDate()).padStart(2, '0') + '/' 
+            + String(today.getMonth() + 1).padStart(2, '0') + '/' 
+            + today.getFullYear(),
+        kind: 'buyer',
+        type: 'rejected',
+        partner: seller,
+        price: price
+      })
+      admin.firestore().collection('Notifications').doc(buyer).update({
+        notifications: newNotifications
+      }).then(() => {
+        console.log('Buyer notifications updated')
+      })
+    })
 }
 
 const PORT = process.env.PORT || 3000
