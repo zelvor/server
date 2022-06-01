@@ -44,13 +44,8 @@ app.post('/buyer-notifications', (req,res) => {
   }
   else handleCancelRegister(
     req.body.receiver,
-    req.body.receiverName,
     req.body.sender,
-    req.body.senderName,
-    req.body.book, 
-    req.body.bookName, 
-    req.body.price)
-  
+    req.body.book)  
 })
 
 app.post('/seller-notifications', (req,res) => {
@@ -151,11 +146,11 @@ async function handleRegisterToBuy(seller, sellerName, buyer,buyerName, book, bo
   })
 }
 
-async function handleCancelRegister(seller, sellerName, buyer,buyerName, book, bookName, price) {
+async function handleCancelRegister(seller, buyer, book) {
   await admin.firestore().collection('Notifications').doc(buyer).get().then(docSnapshot =>{
     let notifications = docSnapshot.data().notifications.filter(notification => {
       return !(notification.bookId == book 
-        && notification.partner == seller 
+        && notification.partner == seller
         && notification.type == 'processing')
     })
 
@@ -208,7 +203,6 @@ async function handleAccept(seller, sellerName, buyer, buyerName, book, bookName
           if (notification.partner != buyer) {
             admin.firestore().collection('Notifications').doc(notification.partner).get()
               .then(docSnapshot => {
-                console.log('Djt me ppl')
                 let newPartnerNotifications = docSnapshot.data().notifications.filter(partnerNoti => {
                   let obj1 = partnerNoti
                   let obj2 = {
@@ -296,7 +290,7 @@ async function handleAccept(seller, sellerName, buyer, buyerName, book, bookName
   
 }
 
-async function handleReject(seller, sellerName, buyer,buyerName, book, bookName, price) {
+async function handleReject(seller, sellerName, buyer, buyerName, book, bookName, price) {
   await admin.firestore().collection('Notifications').doc(seller).get()
     .then(sellerNotiSnapshot => {
       let notifications = sellerNotiSnapshot.data().notifications
@@ -350,6 +344,7 @@ async function handleReject(seller, sellerName, buyer,buyerName, book, bookName,
         console.log('Buyer notifications updated')
       })
     })
+  await handleCancelRegister(seller, buyer, book)
 }
 
 const PORT = process.env.PORT || 3000
