@@ -221,7 +221,7 @@ async function handleAccept(seller, sellerName, buyer, buyerName, book, bookName
                     price: notification.price,
                     type: 'processing'
                   }
-                  return !isEqualsJson(obj1,obj2)
+                  return isEqualsJson(obj1,obj2)
                 })
                 newPartnerNotifications.push({
                   bookId: notification.bookId,
