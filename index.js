@@ -209,8 +209,8 @@ async function handleAccept(seller, sellerName, buyer, buyerName, book, bookName
             admin.firestore().collection('Notifications').doc(notification.partner).get()
               .then(docSnapshot => {
                 console.log('Djt me ppl')
-                let newPartnerNotifications = docSnapshot.data().notifications.filter(notification => {
-                  let obj1 = notification
+                let newPartnerNotifications = docSnapshot.data().notifications.filter(partnerNoti => {
+                  let obj1 = partnerNoti
                   let obj2 = {
                     bookId: notification.bookId,
                     bookName: bookName,
@@ -221,7 +221,7 @@ async function handleAccept(seller, sellerName, buyer, buyerName, book, bookName
                     price: notification.price,
                     type: 'processing'
                   }
-                  return isEqualsJson(obj1,obj2)
+                  return !isEqualsJson(obj1,obj2)
                 })
                 newPartnerNotifications.push({
                   bookId: notification.bookId,
