@@ -32,16 +32,44 @@ app.post('/buyer-notifications', (req,res) => {
   //   })
 
   if (req.body.type == 'register') {
-    handleRegisterToBuy(req.body.receiver, req.body.sender, req.body.book, req.body.price)
+    handleRegisterToBuy(
+      req.body.receiver,
+      req.body.receiverName,
+      req.body.sender,
+      req.body.senderName,
+      req.body.book, 
+      req.body.bookName, 
+      req.body.price)
   }
-  else handleCancelRegister(req.body.receiver, req.body.sender, req.body.book, req.body.price)
+  else handleCancelRegister(
+    req.body.receiver,
+    req.body.receiverName,
+    req.body.sender,
+    req.body.senderName,
+    req.body.book, 
+    req.body.bookName, 
+    req.body.price)
 })
 
 app.post('/seller-notifications', (req,res) => {
   if(req.body.type == 'accepted') {
-    handleAccept(req.body.sender, req.body.receiver, req.body.book, req.body.price)
+    handleAccept(
+      req.body.sender, 
+      req.body.senderName,
+      req.body.receiver, 
+      req.body.receiverName,
+      req.body.book, 
+      req.body.bookName,
+      req.body.price)
   }
-  else handleReject(req.body.sender, req.body.receiver, req.body.book, req.body.price)
+  else handleReject(
+    req.body.sender, 
+    req.body.senderName,
+    req.body.receiver, 
+    req.body.receiverName,
+    req.body.book, 
+    req.body.bookName,
+    req.body.price)
 })
 
 async function sendMessage(sender, receiver, book, kind, type, price) {
