@@ -65,7 +65,7 @@ async function sendMessage(sender, receiver, book, kind, type, price) {
   })
 }
 
-async function handleRegisterToBuy(seller, buyer, book, price) {
+async function handleRegisterToBuy(seller, sellerName, buyer,buyerName, book, bookName, price) {
   await admin.firestore().collection('Notifications').doc(buyer).get().then(docSnapshot =>{
     let notifications = docSnapshot.data().notifications
     notifications.push({
@@ -73,7 +73,9 @@ async function handleRegisterToBuy(seller, buyer, book, price) {
       type: 'processing',
       price: price,
       bookId: book,
+      bookName: bookName,
       partner: seller,
+      partnerName: sellerName,
       date: String(today.getDate()).padStart(2, '0') + '/' 
           + String(today.getMonth() + 1).padStart(2, '0') + '/' 
           + today.getFullYear()
@@ -92,7 +94,9 @@ async function handleRegisterToBuy(seller, buyer, book, price) {
       type: 'processing',
       price: price,
       bookId: book,
+      bookName: bookName,
       partner: buyer,
+      partnerName: buyerName,
       date: String(today.getDate()).padStart(2, '0') + '/' 
           + String(today.getMonth() + 1).padStart(2, '0') + '/' 
           + today.getFullYear()
@@ -116,7 +120,7 @@ async function handleRegisterToBuy(seller, buyer, book, price) {
   })
 }
 
-async function handleCancelRegister(seller, buyer, book, price) {
+async function handleCancelRegister(seller, sellerName, buyer,buyerName, book, bookName, price) {
   await admin.firestore().collection('Notifications').doc(buyer).get().then(docSnapshot =>{
     let notifications = docSnapshot.data().notifications.filter(notification => {
       return !(notification.bookId == book 
@@ -156,7 +160,7 @@ async function handleCancelRegister(seller, buyer, book, price) {
   })
 }
 
-async function handleAccept(seller, buyer, book, price) {
+async function handleAccept(seller, sellerName, buyer,buyerName, book, bookName, price) {
   await admin.firestore().collection('Notifications').doc(seller).get()
     .then(sellerNotiSnapshot => {
       let notifications = sellerNotiSnapshot.data().notifications
@@ -167,19 +171,23 @@ async function handleAccept(seller, buyer, book, price) {
               .then(docSnapshot => {
                 let newPartnerNotifications = docSnapshot.data().notifications.pop({
                   bookId: notification.bookId,
+                  bookName: bookName,
                   date: notification.date,
                   kind: 'buyer',
                   partner: seller,
+                  partnerName: sellerName,
                   price: notification.price,
                   type: 'processing'
                 })
                 newPartnerNotifications.push({
                   bookId: notification.bookId,
+                  bookName: bookName,
                   date: String(today.getDate()).padStart(2, '0') + '/' 
                       + String(today.getMonth() + 1).padStart(2, '0') + '/' 
                       + today.getFullYear(),
                   kind: 'buyer',
                   partner: seller,
+                  partnerName: sellerName,
                   price: notification.price,
                   type: 'rejected'
                 })
@@ -194,12 +202,14 @@ async function handleAccept(seller, buyer, book, price) {
       })
       newNotifications.push({
         bookId: book,
+        bookName: bookName,
         date: String(today.getDate()).padStart(2, '0') + '/' 
             + String(today.getMonth() + 1).padStart(2, '0') + '/' 
             + today.getFullYear(),
         kind: 'seller',
         type: 'accepted',
         partner: buyer,
+        partnerName: buyerName,
         price: price
       })
       admin.firestore().collection('Notifications').doc(seller).update({
@@ -217,12 +227,14 @@ async function handleAccept(seller, buyer, book, price) {
       })
       newNotifications.push({
         bookId: book,
+        bookName: bookName,
         date: String(today.getDate()).padStart(2, '0') + '/' 
             + String(today.getMonth() + 1).padStart(2, '0') + '/' 
             + today.getFullYear(),
         kind: 'buyer',
         type: 'accepted',
         partner: seller,
+        partnerName: sellerName,
         price: price
       })
       admin.firestore().collection('Notifications').doc(buyer).update({
@@ -240,7 +252,7 @@ async function handleAccept(seller, buyer, book, price) {
   
 }
 
-async function handleReject(seller, buyer, book, price) {
+async function handleReject(seller, sellerName, buyer,buyerName, book, price) {
   await admin.firestore().collection('Notifications').doc(seller).get()
     .then(sellerNotiSnapshot => {
       let notifications = sellerNotiSnapshot.data().notifications
@@ -251,12 +263,14 @@ async function handleReject(seller, buyer, book, price) {
       })
       newNotifications.push({
         bookId: book,
+        bookName: bookName,
         date: String(today.getDate()).padStart(2, '0') + '/' 
             + String(today.getMonth() + 1).padStart(2, '0') + '/' 
             + today.getFullYear(),
         kind: 'seller',
         type: 'rejected',
         partner: buyer,
+        partnerName: buyerName,
         price: price
       })
       admin.firestore().collection('Notifications').doc(seller).update({
@@ -276,12 +290,14 @@ async function handleReject(seller, buyer, book, price) {
       })
       newNotifications.push({
         bookId: book,
+        bookName: bookName,
         date: String(today.getDate()).padStart(2, '0') + '/' 
             + String(today.getMonth() + 1).padStart(2, '0') + '/' 
             + today.getFullYear(),
         kind: 'buyer',
         type: 'rejected',
         partner: seller,
+        partnerName: sellerName,
         price: price
       })
       admin.firestore().collection('Notifications').doc(buyer).update({
