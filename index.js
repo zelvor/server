@@ -283,7 +283,7 @@ async function handleAccept(seller, sellerName, buyer,buyerName, book, bookName,
   
 }
 
-async function handleReject(seller, sellerName, buyer,buyerName, book, price) {
+async function handleReject(seller, sellerName, buyer,buyerName, book, bookName, price) {
   await admin.firestore().collection('Notifications').doc(seller).get()
     .then(sellerNotiSnapshot => {
       let notifications = sellerNotiSnapshot.data().notifications
