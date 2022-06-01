@@ -67,7 +67,7 @@ async function sendMessage(sender, receiver, book, kind, type, price) {
 
 async function handleRegisterToBuy(seller, buyer, book, price) {
   await admin.firestore().collection('Notifications').doc(buyer).get().then(docSnapshot =>{
-    const notifications = docSnapshot.data().notifications
+    var notifications = docSnapshot.data().notifications
     notifications.push({
       kind: 'buyer',
       type: 'processing',
@@ -231,6 +231,12 @@ async function handleAccept(seller, buyer, book, price) {
         console.log('Buyer notifications updated')
       })
     })
+
+  await admin.firestore().collection('Books').doc(book).update({
+    quantity: 0
+  }).then(() => {
+    console.log('Quantity list updated')
+  })
   
 }
 
