@@ -78,7 +78,7 @@ async function handleRegisterToBuy(seller, buyer, book, price) {
           + String(today.getMonth() + 1).padStart(2, '0') + '/' 
           + today.getFullYear()
     })
-    firestore().collection('Notifications').doc(buyer).update({
+    admin.firestore().collection('Notifications').doc(buyer).update({
       notifications: notifications
     }).then(() => {
       console.log('Buyer-notification added');
@@ -97,7 +97,7 @@ async function handleRegisterToBuy(seller, buyer, book, price) {
           + String(today.getMonth() + 1).padStart(2, '0') + '/' 
           + today.getFullYear()
     })
-    firestore().collection('Notifications').doc(seller).update({
+    admin.firestore().collection('Notifications').doc(seller).update({
       notifications: notifications
     }).then(() => {
       console.log('Seller-notification added');
@@ -108,7 +108,7 @@ async function handleRegisterToBuy(seller, buyer, book, price) {
     const orderList = docSnapshot.data().orderList
     console.log('orderList:', orderList)
     orderList.push(buyer)
-    firestore().collection('Books').doc(book).update({
+    admin.firestore().collection('Books').doc(book).update({
       orderList: orderList
     }).then(() => {
       console.log('Order list updated')
@@ -124,7 +124,7 @@ async function handleCancelRegister(seller, buyer, book, price) {
           && notification.type == 'processing')
     })
 
-    firestore().collection('Notifications').doc(buyer).update({
+    admin.firestore().collection('Notifications').doc(buyer).update({
       notifications: notifications
     }).then(() => {
       console.log('Buyer-notification added');
@@ -138,7 +138,7 @@ async function handleCancelRegister(seller, buyer, book, price) {
           && notification.type == 'processing')
     })
     
-    firestore().collection('Notifications').doc(seller).update({
+    admin.firestore().collection('Notifications').doc(seller).update({
       notifications: notifications
     }).then(() => {
       console.log('Seller-notification added');
@@ -148,7 +148,7 @@ async function handleCancelRegister(seller, buyer, book, price) {
   await admin.firestore().collection('Books').doc(book).get().then(docSnapshot =>{
     const orderList = docSnapshot.data().orderList
     orderList.pop(buyer)
-    firestore().collection('Books').doc(book).update({
+    admin.firestore().collection('Books').doc(book).update({
       orderList: orderList
     }).then(() => {
       console.log('Order list updated')
