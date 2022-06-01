@@ -120,8 +120,8 @@ async function handleCancelRegister(seller, buyer, book, price) {
   await admin.firestore().collection('Notifications').doc(buyer).get().then(docSnapshot =>{
     const notifications = docSnapshot.data().notifications.filter(notification => {
       return !(notification.bookId == book 
-          && notification.partner == seller 
-          && notification.type == 'processing')
+        && notification.partner == seller 
+        && notification.type == 'processing')
     })
 
     admin.firestore().collection('Notifications').doc(buyer).update({
@@ -134,8 +134,8 @@ async function handleCancelRegister(seller, buyer, book, price) {
   await admin.firestore().collection('Notifications').doc(seller).get().then(docSnapshot =>{
     const notifications = docSnapshot.data().notifications.filter(notification => {
       return !(notification.bookId == book 
-          && notification.partner == buyer 
-          && notification.type == 'processing')
+        && notification.partner == buyer 
+        && notification.type == 'processing')
     })
     
     admin.firestore().collection('Notifications').doc(seller).update({
@@ -161,7 +161,36 @@ async function handleAccept(seller, buyer, book, price) {
     .then(sellerNotiSnapshot => {
       var notifications = sellerNotiSnapshot.data().notifications
       var newNotifications = notifications.filter((notification) => {
-        return notification.bookId != book
+        if (notification.bookId == book && notification.type == 'processing') {
+          if (notification.partner != buyer) {
+            admin.firestore().collection('Notifications').doc(notification.partner).get()
+              .then(docSnapshot => {
+                var newPartnerNotifications = docSnapshot.data().notifications.pop({
+                  bookId: notification.bookId,
+                  date: notification.date,
+                  kind: 'buyer',
+                  partner: seller,
+                  price: notification.price,
+                  type: 'processing'
+                })
+                newPartnerNotifications.push({
+                  bookId: notification.bookId,
+                  date: String(today.getDate()).padStart(2, '0') + '/' 
+                      + String(today.getMonth() + 1).padStart(2, '0') + '/' 
+                      + today.getFullYear(),
+                  kind: 'buyer',
+                  partner: seller,
+                  price: notification.price,
+                  type: 'rejected'
+                })
+                admin.firestore().collection('Notifications').doc(notification.partner).update({
+                  notifications: newPartnerNotifications
+                })
+              })
+          }
+          return false
+        }
+        return true
       })
       newNotifications.push({
         bookId: book,
@@ -184,7 +213,7 @@ async function handleAccept(seller, buyer, book, price) {
     .then(buyerNotiSnapshot => {
       var notifications = buyerNotiSnapshot.data().notifications
       var newNotifications = notifications.filter((notification) => {
-        return notification.bookId != book
+        return !(notification.bookId == book && notification.type == 'processing')
       })
       newNotifications.push({
         bookId: book,
@@ -202,6 +231,7 @@ async function handleAccept(seller, buyer, book, price) {
         console.log('Buyer notifications updated')
       })
     })
+  
 }
 
 async function handleReject(seller, buyer, book, price) {
@@ -209,7 +239,9 @@ async function handleReject(seller, buyer, book, price) {
     .then(sellerNotiSnapshot => {
       var notifications = sellerNotiSnapshot.data().notifications
       var newNotifications = notifications.filter((notification) => {
-        return !(notification.bookId == book && notification.partner == buyer)
+        return !(notification.bookId == book 
+          && notification.partner == buyer
+          && notification.type == 'processing')
       })
       newNotifications.push({
         bookId: book,
@@ -232,7 +264,9 @@ async function handleReject(seller, buyer, book, price) {
     .then(buyerNotiSnapshot => {
       var notifications = buyerNotiSnapshot.data().notifications
       var newNotifications = notifications.filter((notification) => {
-        return !(notification.bookId == book && notification.partner == seller)
+        return !(notification.bookId == book 
+          && notification.partner == seller
+          && notification.type == 'processing')
       })
       newNotifications.push({
         bookId: book,
