@@ -191,7 +191,7 @@ async function handleCancelRegister(seller, sellerName, buyer,buyerName, book, b
   })
 }
 
-async function handleAccept(seller, sellerName, buyer,buyerName, book, bookName, price) {
+async function handleAccept(seller, sellerName, buyer, buyerName, book, bookName, price) {
   await admin.firestore().collection('Notifications').doc(seller).get()
     .then(sellerNotiSnapshot => {
       let notifications = sellerNotiSnapshot.data().notifications
@@ -200,15 +200,18 @@ async function handleAccept(seller, sellerName, buyer,buyerName, book, bookName,
           if (notification.partner != buyer) {
             admin.firestore().collection('Notifications').doc(notification.partner).get()
               .then(docSnapshot => {
-                let newPartnerNotifications = docSnapshot.data().notifications.pop({
-                  bookId: notification.bookId,
-                  bookName: bookName,
-                  date: notification.date,
-                  kind: 'buyer',
-                  partner: seller,
-                  partnerName: sellerName,
-                  price: notification.price,
-                  type: 'processing'
+                console.log('Djt me ppl')
+                let newPartnerNotifications = docSnapshot.data().notifications.filter(notification => {
+                  return notification != {
+                    bookId: notification.bookId,
+                    bookName: bookName,
+                    date: notification.date,
+                    kind: 'buyer',
+                    partner: seller,
+                    partnerName: sellerName,
+                    price: notification.price,
+                    type: 'processing'
+                  }
                 })
                 newPartnerNotifications.push({
                   bookId: notification.bookId,
